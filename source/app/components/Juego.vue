@@ -1,6 +1,7 @@
 <template lang="pug">
 
 #juego
+	a(@click="mover") mover
 	Tetronomo(:tetro="activo" v-if="activo.tetro")
 	.tablero
 		.filas(
@@ -8,8 +9,9 @@
 		)
 			.columna(
 				v-for="col in fila"
-				:class="{fill : col == 1}"
+				:class="{fill : col.cuadro}"
 			)
+				span {{col.fila}}-{{col.col}}
 
 
 </template>
@@ -23,7 +25,10 @@ export default {
 	},
 	data(){
 		return{
-			tablero:[],
+			tabla:{
+				columnas: 10,
+				filas: 20
+			},
 			activo:{
 				posX: 0,
 				posY: 0,
@@ -47,22 +52,40 @@ export default {
 			}
 		}
 	},
+	computed:{
+		tablero(){
+			let tablero = []
+			for(let fila = 0; fila < this.tabla.filas; fila++){
+				let filaP = []
+				for(let col = 0; col < this.tabla.columnas; col++){
+					filaP.push({
+						fila: fila,
+						col: col,
+						cuadro: false
+					})
+				}
+				tablero.push(filaP)
+			}
+			if(this.activo.tetro){
+				let tetro = this.activo.tetro.forma[this.activo.rot]
+				for(let fila = 0; fila < tetro.length; fila++){
+					for(let col = 0; col < tetro[fila].length; col++){
+						if(tetro[fila][col] === 1) {
+							tablero[this.activo.posY + fila][this.activo.posX + col].cuadro = true
+						}
+					}
+				}
+			}
+			return tablero
+		}
+	},
 	mounted(){
-		this.armarTablero()
 		this.activo.tetro = this.tetronomos.j
 	},
 	methods:{
-		armarTablero(){
-			let columnas = 10
-			let filas = 20
-			for(let fila = 0; fila < filas; fila++){
-				let filaP = []
-				for(let col = 0; col < columnas; col++){
-					filaP.push(0)
-				}
-				this.tablero.push(filaP)
-			}
-		}
+		mover(dir){
+			this.activo.posY++
+		},
 	}
 }
 </script>
