@@ -1,8 +1,16 @@
 <template lang="pug">
 
 #juego
-	h1 Hola Mao
-	Tetronomo
+	Tetronomo(:tetro="activo" v-if="activo.tetro")
+	.tablero
+		.filas(
+			v-for="fila in tablero"
+		)
+			.columna(
+				v-for="col in fila"
+				:class="{fill : col == 1}"
+			)
+
 
 </template>
 
@@ -15,19 +23,41 @@ export default {
 	},
 	data(){
 		return{
-			tablero:[]
+			tablero:[],
+			activo:{
+				posX: 0,
+				posY: 0,
+				rot: 0,
+				tetro: null
+			},
+			estaticos:[
+
+			],
+			tetronomos:{
+				j:{
+					forma:[
+						[[0,1,0],[0,1,0],[1,1,0]],
+						[[0,0,0],[1,0,0],[1,1,1]],
+						[[1,1,0],[1,0,0],[1,0,0]],
+						[[1,1,1],[0,0,1],[0,0,0]],
+					],
+					color: "",
+					img: ""
+				}
+			}
 		}
 	},
 	mounted(){
 		this.armarTablero()
+		this.activo.tetro = this.tetronomos.j
 	},
 	methods:{
 		armarTablero(){
 			let columnas = 10
 			let filas = 20
-			for(let fila = 1; fila <= filas; fila++){
+			for(let fila = 0; fila < filas; fila++){
 				let filaP = []
-				for(let col = 1; col <= columnas; col++){
+				for(let col = 0; col < columnas; col++){
 					filaP.push(0)
 				}
 				this.tablero.push(filaP)
@@ -38,5 +68,12 @@ export default {
 </script>
 
 <style lang="sass">
+.filas
+	display: flex
+
+.columna
+	width: 50px
+	height: 50px
+	border: 1px solid black
 
 </style>

@@ -1,7 +1,7 @@
 <template lang="pug">
 .tetronomo
 	.tet-fila(
-		v-for="fila in j.forma"
+		v-for="fila in tetro.tetro.forma[tetro.rot]"
 	)
 		.tet-block(
 			v-for="block in fila"
@@ -13,6 +13,9 @@
 <script>
 export default {
 	name: "Tetronomo",
+	props:[
+		"tetro"
+	],
 	data(){
 		return{
 			j:{
