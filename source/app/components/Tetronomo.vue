@@ -13,20 +13,10 @@
 <script>
 export default {
 	name: "Tetronomo",
-	props:[
-		"tetro"
-	],
-	data(){
-		return{
-			j:{
-				forma: [
-					[0,0,1,0],
-					[0,0,1,0],
-					[0,1,1,0],
-					[0,0,0,0]
-				],
-				color: "rojo"
-			}
+	props:{
+		tetro:{
+			type: Object,
+			default: () => ({})
 		}
 	}
 }

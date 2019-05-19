@@ -12,14 +12,14 @@
 			)
 				.columna(
 					v-for="col in fila"
-					:class="{fill : col.cuadro}"
+					:class="{fill : col.act}"
 				)
 					span {{col.fila}}-{{col.col}}
-
 </template>
 
 <script>
 import Tetronomo from "./Tetronomo"
+import Tetronomos from "../tetronomos"
 export default {
 	name: "Juego",
 	components:{
@@ -37,58 +37,9 @@ export default {
 				rot: 0,
 				tetro: null
 			},
-			estaticos:[
-
-			],
-			tetronomos:{
-				j:{
-					forma:[
-						[[0,1,0],[0,1,0],[1,1,0]],
-						[[1,0,0],[1,1,1],[0,0,0]],
-						[[0,1,1],[0,1,0],[0,1,0]],
-						[[0,0,0],[1,1,1],[0,0,1]]
-					],
-					color: "",
-					img: ""
-				}
-			}
+			estaticos:[],
+			tetronomos: Tetronomos
 		}
-	},
-	computed:{
-		tablero(){
-			let tablero = []
-			//creacion de tablero vacio
-			for(let fila = 0; fila < this.tabla.filas; fila++){
-				let filaP = []
-				for(let col = 0; col < this.tabla.columnas; col++){
-					filaP.push({
-						fila: fila,
-						col: col,
-						cuadro: false
-					})
-				}
-				tablero.push(filaP)
-			}
-			// si hay un tetromeno activo se agrega al tablero
-			if(this.activo.tetro){
-				let tetro = this.activo.tetro.forma[this.activo.rot]
-				for(let fila = 0; fila < tetro.length; fila++){
-					for(let col = 0; col < tetro[fila].length; col++){
-						if(tetro[fila][col] === 1){
-							tablero[this.activo.posY + fila][this.activo.posX + col].cuadro = true
-						}
-					}
-				}
-			}
-			return tablero
-		}
-	},
-	mounted(){
-		this.activo.tetro = this.tetronomos.j
-		window.addEventListener("keydown", this.keyEvents)
-	},
-	beforeDestroy(){
-		window.removeEventListener("keydown", this.keyEvents)
 	},
 	methods:{
 		keyEvents(event){
@@ -131,13 +82,66 @@ export default {
 			return !(this.activo.posX - 1 < 0 - primeroEnTetro)
 		},
 		rotar(){
-			if(this.activo.rot === this.activo.tetro.forma.length -1){
-				this.activo.rot = 0
+			let nextIndex = this.activo.rot
+			if(nextIndex === this.activo.tetro.forma.length -1){
+				nextIndex = 0
 			}else{
-				this.activo.rot++
+				nextIndex++
 			}
+
+			let nextTetro = this.activo.tetro.forma[nextIndex]
+
+			// si se encuentra con un muro no rote inicio
+			for(let posY = 0; posY < nextTetro.length; posY++){
+				let posTabY = posY + this.activo.posY
+				for(let posX = 0; posX < nextTetro[posY].length; posX++){
+					let posTabX = posX + this.activo.posX
+					// si no existe la fila en el tablero no hace la rotacion
+					if(!this.tablero[posTabY]) return
+					// si no existe la columna en el tablero no hace la rotacion
+					if(!this.tablero[posTabY][posTabX]) return
+				}
+			}
+			this.activo.rot = nextIndex
 		}
-	}
+	},
+	computed:{
+		tablero(){
+			let tablero = []
+			//creacion de tablero vacio
+			for(let fila = 0; fila < this.tabla.filas; fila++){
+				let filaP = []
+				for(let col = 0; col < this.tabla.columnas; col++){
+					filaP.push({
+						fila: fila,
+						col: col,
+						act: false,
+						est: false
+					})
+				}
+				tablero.push(filaP)
+			}
+			// si hay un tetromeno activo se agrega al tablero
+			if(this.activo.tetro){
+				let tetro = this.activo.tetro.forma[this.activo.rot]
+				for(let fila = 0; fila < tetro.length; fila++){
+					for(let col = 0; col < tetro[fila].length; col++){
+						if(tetro[fila][col] === 1){
+							tablero[this.activo.posY + fila][this.activo.posX + col].act = true
+						}
+					}
+				}
+			}
+			return tablero
+		}
+	},
+	mounted(){
+		this.activo.tetro = this.tetronomos.t
+		window.addEventListener("keydown", this.keyEvents)
+	},
+	beforeDestroy(){
+		window.removeEventListener("keydown", this.keyEvents)
+	},
 }
 </script>
 
